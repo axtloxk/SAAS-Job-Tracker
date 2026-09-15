@@ -71,7 +71,7 @@ export default function LoginPage() {
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1">
-            <label className="text-xs font-medium">Email</label>
+            <label className="text-xs font-medium">Email or username</label>
             <input
               type="text"
               name="identifier"
@@ -79,7 +79,7 @@ export default function LoginPage() {
               value={form.identifier}
               onChange={(e) => setForm({ ...form, identifier: e.target.value })}
               className="w-full rounded-md border border-input bg-background px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
-              placeholder="you@example.com"
+              placeholder="John doe"
             />
           </div>
 

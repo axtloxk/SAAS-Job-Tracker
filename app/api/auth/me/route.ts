@@ -6,7 +6,10 @@ export async function GET() {
   const token = cookieStore.get("auth_token")?.value;
 
   if (!token) {
-    return NextResponse.json({ authenticated: false }, { status: 401 });
+    return NextResponse.json(
+      { authenticated: false, message: "Login in to continue." },
+      { status: 401 },
+    );
   }
 
   return NextResponse.json({ authenticated: true }, { status: 200 });
