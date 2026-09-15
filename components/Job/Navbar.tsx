@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { easeOut, motion } from "motion/react";
 import {
   Briefcase,
@@ -20,24 +20,22 @@ const NAV_LINKS = [
   { name: "Contact", href: "/#contact", icon: Mail },
 ];
 
-// 1. Parent Variant: Controls timing and orchestrates when children animate
 const navVariants = {
   hidden: { opacity: 0 },
   visible: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.1, // Delays each child animation by 0.1s
-      delayChildren: 0.05, // Slight pause before starting the sequence
+      staggerChildren: 0.1,
+      delayChildren: 0.05,
     },
   },
 };
 
-// 2. Child Variant: Controls physical movement (left to right fade-in)
 const itemVariants = {
-  hidden: { opacity: 0, x: -20 }, // Start hidden and 20px to the left
+  hidden: { opacity: 0, x: -20 },
   visible: {
     opacity: 1,
-    x: 0, // Slide into its natural position
+    x: 0,
     transition: {
       duration: 0.35,
       ease: easeOut,
@@ -47,7 +45,34 @@ const itemVariants = {
 
 export default function Navbar() {
   const pathname = usePathname();
+  const router = useRouter();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  // Check login state via server endpoint
+  useEffect(() => {
+    const checkAuth = async () => {
+      try {
+        const res = await fetch("/api/auth/me");
+        setIsLoggedIn(res.ok);
+      } catch {
+        setIsLoggedIn(false);
+      }
+    };
+
+    checkAuth();
+  }, [pathname]);
+
+  const handleLogout = async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+      setIsLoggedIn(false);
+      router.push("/login");
+      router.refresh();
+    } catch (err) {
+      console.error("Logout error:", err);
+    }
+  };
 
   return (
     <motion.header
@@ -75,7 +100,6 @@ export default function Navbar() {
           {NAV_LINKS.map((link) => {
             const Icon = link.icon;
 
-            // Dynamic href check
             const href =
               link.name === "Contact"
                 ? "mailto:husseinabozaia@gmail.com"
@@ -114,12 +138,21 @@ export default function Navbar() {
           </motion.div>
 
           <motion.div variants={itemVariants}>
-            <Link
-              href="/login"
-              className="inline-flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-medium hover:bg-accent transition-colors shadow-sm"
-            >
-              <span>Login</span>
-            </Link>
+            {isLoggedIn ? (
+              <button
+                onClick={handleLogout}
+                className="inline-flex cursor-pointer items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-medium text-red-500 hover:bg-accent transition-colors shadow-sm"
+              >
+                <span>Logout</span>
+              </button>
+            ) : (
+              <Link
+                href="/login"
+                className="inline-flex items-center gap-2 rounded-lg border border-border px-4 py-2 text-sm font-medium hover:bg-accent transition-colors shadow-sm"
+              >
+                <span>Login</span>
+              </Link>
+            )}
           </motion.div>
         </div>
 
@@ -145,7 +178,6 @@ export default function Navbar() {
             {NAV_LINKS.map((link) => {
               const Icon = link.icon;
 
-              // Dynamic href check
               const href =
                 link.name === "Contact"
                   ? "mailto:husseinabozaia@gmail.com"
@@ -180,13 +212,26 @@ export default function Navbar() {
               <Plus className="h-4 w-4" />
               <span>Add Application</span>
             </Link>
-            <Link
-              href="/login"
-              onClick={() => setMobileMenuOpen(false)}
-              className="flex w-full items-center justify-center gap-2 rounded-lg  py-2.5 text-sm font-medium  shadow-md hover:bg-primary/90 transition-colors"
-            >
-              <span>Login</span>
-            </Link>
+
+            {isLoggedIn ? (
+              <button
+                onClick={() => {
+                  setMobileMenuOpen(false);
+                  handleLogout();
+                }}
+                className="flex w-full cursor-pointer items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-medium text-red-500 shadow-md hover:bg-accent transition-colors"
+              >
+                <span>Logout</span>
+              </button>
+            ) : (
+              <Link
+                href="/login"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex w-full items-center justify-center gap-2 rounded-lg py-2.5 text-sm font-medium shadow-md hover:bg-primary/90 transition-colors"
+              >
+                <span>Login</span>
+              </Link>
+            )}
           </div>
         </div>
       )}

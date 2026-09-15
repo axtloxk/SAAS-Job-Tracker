@@ -13,9 +13,13 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className="h-full antialiased scroll-smooth">
+    <html
+      lang="en"
+      data-scroll-behavior="smooth"
+      className="h-full antialiased scroll-smooth"
+    >
       <body className="flex min-h-full flex-col">
-        <Navbar />
+        {/* <Navbar /> */}
         <main className="flex-1">{children}</main>
       </body>
     </html>
