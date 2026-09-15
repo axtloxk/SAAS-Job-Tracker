@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import { Plus, LogOut, X, ExternalLink } from "lucide-react";
+import { Plus, LogOut, X, ExternalLink, Trash2 } from "lucide-react";
 
 interface Application {
   id: string;
@@ -51,6 +51,26 @@ export default function page() {
     fetchData();
   }, []); // only trigger when on load.
 
+  // handle delete
+  const handleDelete = async (id: string) => {
+    try {
+      const res = await fetch("/api/applications", {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ id }),
+      });
+
+      if (res.ok) {
+        setApplications((prev) => prev.filter((app) => app.id !== id));
+      }
+    } catch (error) {
+      console.error("Failed to delete application:", error);
+    }
+  };
+
+  // logout
   const handleLogout = async () => {
     try {
       await fetch("/api/auth/logout", { method: "POST" });
@@ -104,7 +124,9 @@ export default function page() {
       <nav className="sticky top-0 z-40 w-full border-b border-border bg-background/95 backdrop-blur">
         <div className="container mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
           <div className="text-lg font-semibold tracking-tight">
-            Welcome,{" "}
+            <span className="text-gray-600/70 font-light mr-3">
+              Welcome dear,
+            </span>{" "}
             {isLoading ? (
               <span className="animate-pulse bg-muted text-transparent rounded">
                 Loading
@@ -174,16 +196,28 @@ export default function page() {
                     {app.status}
                   </span>
 
-                  {app.applyLink && (
-                    <a
-                      href={app.applyLink}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-muted-foreground hover:text-primary transition-colors"
+                  <div className="flex items-center gap-3">
+                    {app.applyLink && (
+                      <a
+                        href={app.applyLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-muted-foreground hover:text-primary transition-colors"
+                      >
+                        <ExternalLink className="h-4 w-4" />
+                      </a>
+                    )}
+
+                    <button
+                      onClick={() => handleDelete(app.id)}
+                      className="inline-flex items-center gap-2 rounded-md border border-border px-3 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground transition-colors"
+                      aria-label={`Delete ${app.jobTitle} application`}
                     >
-                      <ExternalLink className="h-4 w-4" />
-                    </a>
-                  )}
+                      <span className="hidden sm:inline">Delete</span>
+
+                      <Trash2 className="h-3 w-3" />
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}

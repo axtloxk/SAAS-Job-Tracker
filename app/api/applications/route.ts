@@ -67,8 +67,53 @@ export async function POST(req: Request) {
 
     return NextResponse.json(application, { status: 201 });
   } catch (error) {
+    console.error("APPLICATIONS ERROR:", error);
+
     return NextResponse.json(
-      { error: "Failed to create application" },
+      { error: "Failed to fetch data" },
+      { status: 500 },
+    );
+  }
+}
+
+// DELETE: Delete an application
+export async function DELETE(req: Request) {
+  try {
+    const cookieStore = await cookies();
+    const token = cookieStore.get("auth_token")?.value;
+
+    if (!token) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const decoded = jwt.verify(token, JWT_SECRET) as { userId: string };
+
+    const { id } = await req.json();
+
+    // Delete only if the application belongs to the logged-in user
+    const application = await prisma.application.deleteMany({
+      where: {
+        id,
+        userId: decoded.userId,
+      },
+    });
+
+    if (application.count === 0) {
+      return NextResponse.json(
+        { error: "Application not found" },
+        { status: 404 },
+      );
+    }
+
+    return NextResponse.json(
+      { message: "Application deleted successfully" },
+      { status: 200 },
+    );
+  } catch (error) {
+    console.error("APPLICATIONS ERROR:", error);
+
+    return NextResponse.json(
+      { error: "Failed to fetch data" },
       { status: 500 },
     );
   }
