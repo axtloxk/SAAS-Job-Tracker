@@ -1,11 +1,13 @@
 # Preview
 
-![Demo Preview](./public/assets/Preview-1.png)
+![Demo Preview](/assets/Preview-1.png)
 
-![Demo Preview Footer](./public/assets/Preview-2-footer.png)
+![Demo Preview Footer](/assets/Preview-2-footer.png)
 
-![Demo Preview Login](./public/assets/auth-login.png)
-![Demo Preview Register](./public/assets/auth-register.png)
+![Demo Preview Login](/assets/auth-login.png)
 
-![Dashboard](./public/assets/dashboard.png)
-![Dashboard Add new Application](./public/assets/add%20application.png)
+![Demo Preview Register](/assets/auth-register.png)
+
+![Dashboard](/assets/dashboard.png)
+
+![Dashboard Add new Application](/assets/add%20application.png)
