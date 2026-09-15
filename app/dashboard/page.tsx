@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { motion, Variants } from "motion/react";
 import { Plus, LogOut, X, ExternalLink, Trash2, ArrowLeft } from "lucide-react";
 import Link from "next/link";
+import { toast } from "sonner";
 
 interface Application {
   id: string;
@@ -106,12 +107,15 @@ export default function page() {
   // Logout
   const handleLogout = async () => {
     try {
+      toast.success("Logged out successfully!");
+
       await fetch("/api/auth/logout", { method: "POST" });
 
       router.push("/login");
       router.refresh();
     } catch (err) {
       console.error("Logout failed:", err);
+      toast.error(err instanceof Error ? err.message : "Failed to log out");
     }
   };
 

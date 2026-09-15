@@ -5,19 +5,24 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion, AnimatePresence } from "motion/react";
 import { Eye, EyeOff, ArrowRight, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 const MotionLink = motion.create(Link);
 
 export default function LoginPage() {
   const router = useRouter();
-  const [form, setForm] = useState({ email: "", password: "", identifier: "" });
+
+  const [form, setForm] = useState({
+    email: "",
+    password: "",
+    identifier: "",
+  });
+
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
     setLoading(true);
 
     try {
@@ -36,10 +41,12 @@ export default function LoginPage() {
         throw new Error(data.error || "Failed to log in");
       }
 
+      toast.success("Welcome back!");
+
       router.push("/dashboard");
       router.refresh();
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : "Failed to log in");
     } finally {
       setLoading(false);
     }
@@ -58,20 +65,16 @@ export default function LoginPage() {
       >
         <div className="space-y-2 text-center">
           <h1 className="text-2xl font-bold tracking-tight">Welcome back</h1>
+
           <p className="text-sm text-muted-foreground">
             Sign in to access your job applications tracker
           </p>
         </div>
 
-        {error && (
-          <div className="rounded-md bg-destructive/15 p-3 text-center text-sm text-destructive">
-            {error}
-          </div>
-        )}
-
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1">
             <label className="text-xs font-medium">Email or username</label>
+
             <input
               type="text"
               name="identifier"
@@ -85,6 +88,7 @@ export default function LoginPage() {
 
           <div className="space-y-1">
             <label className="text-xs font-medium">Password</label>
+
             <div className="relative">
               <input
                 type={showPassword ? "text" : "password"}
@@ -95,7 +99,6 @@ export default function LoginPage() {
                 placeholder="••••••••"
               />
 
-              {/* Password Eye Toggle */}
               <button
                 type="button"
                 onClick={() => setShowPassword((prev) => !prev)}
@@ -129,7 +132,6 @@ export default function LoginPage() {
             </div>
           </div>
 
-          {/* Submit button animation */}
           <motion.div
             whileHover={{ scale: 1.01 }}
             whileTap={{ scale: 0.98 }}
@@ -152,9 +154,8 @@ export default function LoginPage() {
           </motion.div>
         </form>
 
-        {/* Link hover animation */}
         <p className="text-center text-xs text-muted-foreground">
-          Don&apos;t have an account?{" "}
+          Don't have an account?{" "}
           <MotionLink
             href="/register"
             whileHover={{ x: 2, opacity: 0.8 }}

@@ -13,6 +13,7 @@ import {
   X,
   Plus,
 } from "lucide-react";
+import { toast } from "sonner";
 
 const NAV_LINKS = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
@@ -67,10 +68,13 @@ export default function Navbar() {
     try {
       await fetch("/api/auth/logout", { method: "POST" });
       setIsLoggedIn(false);
+      toast.success("Logged out successfully!");
       router.push("/login");
       router.refresh();
     } catch (err) {
       console.error("Logout error:", err);
+
+      toast.error(err instanceof Error ? err.message : "Failed to log out");
     }
   };
 

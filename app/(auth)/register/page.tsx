@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
 import Link from "next/link";
 import { motion, AnimatePresence } from "motion/react";
 import { Eye, EyeOff, ArrowRight, Loader2 } from "lucide-react";
@@ -12,12 +13,11 @@ export default function RegisterPage() {
   const router = useRouter();
   const [form, setForm] = useState({ username: "", email: "", password: "" });
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState("");
+  // const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError("");
     setLoading(true);
 
     try {
@@ -34,11 +34,11 @@ export default function RegisterPage() {
       if (!res.ok) {
         throw new Error(data.error || "Registration failed");
       }
-
+      toast.success("Account created successfully!");
       router.push("/dashboard");
       router.refresh();
-    } catch (err: any) {
-      setError(err.message);
+    } catch (err: unknown) {
+      toast.error(err instanceof Error ? err.message : "Registration failed");
     } finally {
       setLoading(false);
     }
@@ -62,11 +62,11 @@ export default function RegisterPage() {
           </p>
         </div>
 
-        {error && (
+        {/* {error && (
           <div className="rounded-md bg-destructive/15 p-3 text-center text-sm text-destructive">
             {error}
           </div>
-        )}
+        )} */}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div className="space-y-1">
