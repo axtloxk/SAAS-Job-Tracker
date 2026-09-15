@@ -16,8 +16,8 @@ import {
 
 const NAV_LINKS = [
   { name: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { name: "About", href: "/about", icon: Info },
-  { name: "Contact", href: "/contact", icon: Mail },
+  { name: "About", href: "/#about", icon: Info },
+  { name: "Contact", href: "/#contact", icon: Mail },
 ];
 
 // 1. Parent Variant: Controls timing and orchestrates when children animate
@@ -40,7 +40,7 @@ const itemVariants = {
     x: 0, // Slide into its natural position
     transition: {
       duration: 0.35,
-      ease: easeOut, // it was a string but gave me an error and the fix was to apply easeOut from moiton/react itself.
+      ease: easeOut,
     },
   },
 };
@@ -74,12 +74,19 @@ export default function Navbar() {
         <nav className="hidden md:flex items-center gap-1">
           {NAV_LINKS.map((link) => {
             const Icon = link.icon;
-            const isActive = pathname === link.href;
+
+            // Dynamic href check
+            const href =
+              link.name === "Contact"
+                ? "mailto:husseinabozaia@gmail.com"
+                : link.href;
+
+            const isActive = pathname === href;
 
             return (
-              <motion.div key={link.href} variants={itemVariants}>
+              <motion.div key={link.name} variants={itemVariants}>
                 <Link
-                  href={link.href}
+                  href={href}
                   className={`flex items-center gap-2 rounded-md px-3.5 py-2 text-sm font-medium transition-colors ${
                     isActive
                       ? "bg-accent text-accent-foreground font-semibold"
@@ -137,12 +144,19 @@ export default function Navbar() {
           <nav className="flex flex-col gap-1">
             {NAV_LINKS.map((link) => {
               const Icon = link.icon;
-              const isActive = pathname === link.href;
+
+              // Dynamic href check
+              const href =
+                link.name === "Contact"
+                  ? "mailto:husseinabozaia@gmail.com"
+                  : link.href;
+
+              const isActive = pathname === href;
 
               return (
                 <Link
-                  key={link.href}
-                  href={link.href}
+                  key={link.name}
+                  href={href}
                   onClick={() => setMobileMenuOpen(false)}
                   className={`flex items-center gap-3 rounded-md px-3 py-2 text-base font-medium transition-colors ${
                     isActive
@@ -157,7 +171,7 @@ export default function Navbar() {
             })}
           </nav>
 
-          <div className="mt-4 pt-4 border-t border-border">
+          <div className="mt-4 pt-4 flex flex-col gap-3 border-t border-border">
             <Link
               href="/dashboard/new"
               onClick={() => setMobileMenuOpen(false)}
@@ -165,6 +179,13 @@ export default function Navbar() {
             >
               <Plus className="h-4 w-4" />
               <span>Add Application</span>
+            </Link>
+            <Link
+              href="/login"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex w-full items-center justify-center gap-2 rounded-lg  py-2.5 text-sm font-medium  shadow-md hover:bg-primary/90 transition-colors"
+            >
+              <span>Login</span>
             </Link>
           </div>
         </div>
