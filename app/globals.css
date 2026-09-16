@@ -118,7 +118,7 @@
   /* Primary App Theme (Bound to Cold Isolation) */
   --background: var(--bg-cold);
   --foreground: var(--text-cold);
-  --card: oklch(0.14 0.02 260);
+  --card: oklch(0.14 0.01 260);
   --card-foreground: var(--text-cold);
   --popover: oklch(0.14 0.02 260);
   --popover-foreground: var(--text-cold);
