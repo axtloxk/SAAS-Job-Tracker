@@ -11,6 +11,7 @@ interface Application {
   id: string;
   jobTitle: string;
   companyName: string;
+  description?: string; // Added description to interface
   status: string;
   appliedAt: string;
   applyLink: string | null;
@@ -58,6 +59,7 @@ export default function page() {
   const [formData, setFormData] = useState({
     jobTitle: "",
     companyName: "",
+    description: "", // Added description to form state
     status: "APPLIED",
     date: "",
     applyLink: "",
@@ -120,7 +122,9 @@ export default function page() {
   };
 
   const handleInputChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>,
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement
+    >,
   ) => {
     const { name, value } = e.target;
 
@@ -154,6 +158,7 @@ export default function page() {
         setFormData({
           jobTitle: "",
           companyName: "",
+          description: "",
           status: "APPLIED",
           date: "",
           applyLink: "",
@@ -163,6 +168,18 @@ export default function page() {
       console.error("Failed to submit application:", error);
     }
   };
+
+  // Helper to format dates nicely
+  const formatDate = (dateString: string) => {
+    if (!dateString) return "N/A";
+    const date = new Date(dateString);
+    return date.toLocaleDateString(undefined, {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  };
+
   return (
     <motion.div
       variants={containerVariants}
@@ -192,7 +209,7 @@ export default function page() {
           <div className="flex items-center gap-3 md:gap-4">
             <button
               onClick={() => setIsModalOpen(true)}
-              className="inline-flex items-center gap-2 rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90"
+              className="inline-flex items-center gap-2 rounded-md bg-primary px-3 py-2 text-sm font-medium text-primary-foreground shadow transition-colors hover:bg-primary/90 cursor-pointer"
             >
               <Plus className="h-4 w-4" />
               <span className="hidden sm:inline">New Application</span>
@@ -201,7 +218,7 @@ export default function page() {
 
             <button
               onClick={handleLogout}
-              className="inline-flex items-center gap-2 rounded-md border border-border px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground"
+              className="inline-flex items-center gap-2 rounded-md border border-border px-3 py-2 text-sm font-medium transition-colors hover:bg-accent hover:text-accent-foreground cursor-pointer"
             >
               <LogOut className="h-4 w-4" />
               <span className="hidden sm:inline">Logout</span>
@@ -242,50 +259,76 @@ export default function page() {
             variants={containerVariants}
             initial="hidden"
             animate="visible"
-            className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-4"
+            className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
           >
             {applications.map((app) => (
               <motion.div
                 key={app.id}
                 variants={cardVariants}
-                className="flex flex-col justify-between rounded-xl border border-border bg-card p-5 shadow-sm"
+                className="flex flex-col justify-between rounded-xl border border-border bg-card p-5 shadow-sm hover:shadow-md transition-shadow"
               >
-                <div>
-                  <h3 className="truncate font-semibold text-card-foreground">
-                    {app.jobTitle}
-                  </h3>
+                <div className="flex flex-col gap-3">
+                  {/* Title & Company */}
+                  <div>
+                    <h3 className="text-lg font-semibold text-card-foreground line-clamp-1">
+                      {app.jobTitle}
+                    </h3>
+                    <p className="font-medium text-muted-foreground line-clamp-1">
+                      {app.companyName}
+                    </p>
+                  </div>
 
-                  <p className="truncate text-sm text-muted-foreground">
-                    {app.companyName}
-                  </p>
+                  {/* Description */}
+                  {app.description && (
+                    <p className="text-sm text-muted-foreground line-clamp-3">
+                      {app.description}
+                    </p>
+                  )}
+
+                  {/* Meta Details: Status & Date */}
+                  <div className="mt-2 flex flex-col gap-2 text-sm">
+                    <div className="flex items-center gap-2">
+                      <span className="font-semibold text-foreground">
+                        Status:
+                      </span>
+                      <span className="inline-flex items-center rounded-full border border-border/60 bg-muted/40 px-2.5 py-0.5 text-xs font-semibold text-muted-foreground">
+                        {app.status}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <span className="font-semibold text-foreground">
+                        Date Applied:
+                      </span>
+                      <span className="text-muted-foreground">
+                        {formatDate(app.appliedAt)}
+                      </span>
+                    </div>
+                  </div>
                 </div>
 
-                <div className="mt-4 flex items-center justify-between">
-                  <span className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold">
-                    {app.status}
-                  </span>
-
-                  <div className="flex items-center gap-3">
-                    {app.applyLink && (
-                      <a
-                        href={app.applyLink}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-muted-foreground transition-colors hover:text-primary"
-                      >
-                        <ExternalLink className="h-4 w-4" />
-                      </a>
-                    )}
-
-                    <button
-                      onClick={() => handleDelete(app.id)}
-                      className="inline-flex items-center gap-2 rounded-md border border-border px-3 py-2 text-sm font-medium transition-colors hover:bg-red-400/40 cursor-pointer active:bg-red-100 hover:text-accent-foreground"
-                      aria-label={`Delete ${app.jobTitle} application`}
+                {/* Actions */}
+                <div className="mt-4 flex items-center justify-end gap-3 border-t border-border/50 pt-2">
+                  {app.applyLink && (
+                    <a
+                      href={app.applyLink}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-muted-foreground transition-colors hover:text-primary"
+                      aria-label="View Application Link"
                     >
-                      <span className="hidden sm:inline">Delete</span>
-                      <Trash2 className="h-3 w-3" />
-                    </button>
-                  </div>
+                      <ExternalLink className="h-4 w-4" />
+                    </a>
+                  )}
+
+                  <button
+                    onClick={() => handleDelete(app.id)}
+                    className="inline-flex items-center gap-2 rounded-md border border-border px-3 py-2 text-sm font-medium transition-colors hover:bg-red-400/40 cursor-pointer active:bg-red-400 hover:text-accent-foreground"
+                    aria-label={`Delete ${app.jobTitle} application`}
+                  >
+                    <span className="hidden sm:inline">Delete</span>
+                    <Trash2 className="h-4 w-4" />
+                  </button>
                 </div>
               </motion.div>
             ))}
@@ -296,7 +339,7 @@ export default function page() {
       {/* 3. New Application Modal */}
       {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-background/80 p-4 backdrop-blur-sm">
-          <div className="w-full max-w-md rounded-xl border border-border bg-card p-6 shadow-lg sm:p-8">
+          <div className="w-full max-w-md rounded-xl border border-border bg-card p-6 shadow-lg sm:p-8 max-h-[90vh] overflow-y-auto">
             <div className="mb-6 flex items-center justify-between">
               <h2 className="text-xl font-semibold text-card-foreground">
                 Add New Application
@@ -304,7 +347,7 @@ export default function page() {
 
               <button
                 onClick={() => setIsModalOpen(false)}
-                className="rounded-full p-1 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground"
+                className="rounded-full p-1 text-muted-foreground transition-colors hover:bg-accent hover:text-foreground cursor-pointer"
               >
                 <X className="h-5 w-5" />
               </button>
@@ -315,7 +358,6 @@ export default function page() {
                 <label htmlFor="jobTitle" className="text-sm font-medium">
                   Job Title
                 </label>
-
                 <input
                   type="text"
                   id="jobTitle"
@@ -332,7 +374,6 @@ export default function page() {
                 <label htmlFor="companyName" className="text-sm font-medium">
                   Company Name
                 </label>
-
                 <input
                   type="text"
                   id="companyName"
@@ -346,10 +387,23 @@ export default function page() {
               </div>
 
               <div className="flex flex-col gap-1.5">
+                <label htmlFor="description" className="text-sm font-medium">
+                  Description / Notes (Optional)
+                </label>
+                <textarea
+                  id="description"
+                  name="description"
+                  value={formData.description}
+                  onChange={handleInputChange}
+                  className="flex min-h-[80px] w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+                  placeholder="Any extra details about the job..."
+                />
+              </div>
+
+              <div className="flex flex-col gap-1.5">
                 <label htmlFor="status" className="text-sm font-medium">
                   Application Status
                 </label>
-
                 <select
                   id="status"
                   name="status"
@@ -369,7 +423,6 @@ export default function page() {
                 <label htmlFor="date" className="text-sm font-medium">
                   Date Applied
                 </label>
-
                 <input
                   type="date"
                   id="date"
@@ -385,7 +438,6 @@ export default function page() {
                 <label htmlFor="applyLink" className="text-sm font-medium">
                   Application Link (Optional)
                 </label>
-
                 <input
                   type="url"
                   id="applyLink"
@@ -401,14 +453,13 @@ export default function page() {
                 <button
                   type="button"
                   onClick={() => setIsModalOpen(false)}
-                  className="rounded-md border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-accent hover:text-accent-foreground"
+                  className="rounded-md border border-input bg-background px-4 py-2 text-sm font-medium hover:bg-accent  cursor-pointer hover:text-accent-foreground"
                 >
                   Cancel
                 </button>
-
                 <button
                   type="submit"
-                  className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow hover:bg-primary/90"
+                  className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground shadow  cursor-pointer hover:bg-primary/90"
                 >
                   Save Application
                 </button>

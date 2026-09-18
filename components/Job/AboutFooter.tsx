@@ -35,7 +35,7 @@ const AboutFooter = () => {
       initial="hidden"
       whileInView="visible"
       viewport={{ once: true, amount: 0.2 }}
-      className="w-full border-t border-t-gray-300/90 border-border/60 bg-card/50 py-12 mt-auto"
+      className="w-full border-t border-t-gray-300/90 border-border/60 dark:border-t-gray-800/40 py-12 mt-17"
     >
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <div className="grid grid-cols-1 gap-10 md:grid-cols-2">
